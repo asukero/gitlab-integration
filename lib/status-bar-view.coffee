@@ -105,7 +105,12 @@ class StatusBarView extends HTMLElement
                     when stage.status is 'success'
                         e.classList.add('icon', 'gitlab-success')
                     when stage.status is 'failed'
-                        e.classList.add('icon', 'gitlab-failed')
+                        icon_class = 'gitlab-failed'
+                        for job in stage.jobs
+                          if job.status is 'success'
+                            icon_class = 'gitlab-warning'
+                            break;
+                        e.classList.add('icon', icon_class)
                     when stage.status is 'running'
                         e.classList.add('icon', 'gitlab-running')
                     when stage.status is 'pending'

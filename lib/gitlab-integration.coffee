@@ -27,6 +27,10 @@ class GitlabIntegration
             title: 'Enable debug output in console'
             type: 'boolean'
             default: false
+        branch:
+            title: 'Indicate specific branch to look at'
+            type: 'string'
+            default: ''
 
     consumeStatusBar: (statusBar) ->
         @statusBar = statusBar
@@ -84,10 +88,11 @@ class GitlabIntegration
         if origin?
             log "     - origin:", origin
             url = GitUrlParse(origin)
+            url = url
             log "     - url:", url
             if url?
                 projectName = url.pathname
-                    .slice(1).replace(/\.git$/, '').toLowerCase()
+                    .slice(1).replace(/\.git$/, '').toLowerCase().replace("gitlab/", "")
                 log "     - name:", projectName
                 @projects[project.getPath()] = projectName
                 sshProto = (

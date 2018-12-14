@@ -5,6 +5,7 @@ class GitlabStatus
     constructor: (@view, @timeout=null, @projects={}, @pending=[], @jobs={}) ->
         @token = atom.config.get('gitlab-integration.token')
         @period = atom.config.get('gitlab-integration.period')
+        @branch = atom.config.get('gitlab-integration.branch')
         @unsecureSsl = atom.config.get('gitlab-integration.unsecureSsl')
         @updating = {}
         @watchTimeout = null
@@ -12,7 +13,7 @@ class GitlabStatus
 
     fetch: (host, q, paging=false) ->
         log " -> fetch '#{q}' from '#{host}'"
-        @get("#{@protocol}://#{host}/api/v4/#{q}").then((res) =>
+        @get("#{@protocol}://#{host}/gitlab/api/v4/#{q}").then((res) =>
             log " <- ", res
             if res.headers['x-next-page']
                 if paging
@@ -121,7 +122,10 @@ class GitlabStatus
                 if project? and project.id? and not @updating[projectPath]
                     @updating[projectPath] = true
                     try
-                        ref = repos?.getShortHead?()
+                        if @branch?
+                            ref = @branch
+                        else
+                            ref = repos?.getShortHead?()
                     catch error
                         console.error "cannot get project #{projectPath} ref", error
                         delete @projects[projectPath]
